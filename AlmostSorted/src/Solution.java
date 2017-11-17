@@ -14,23 +14,27 @@ public class Solution {
 	}
 	
 	// verify if the two elements can be swapped
-	private boolean trySwap(int[] array, int i1, int i2) {
+	private static boolean trySwap(int[] array, int i1, int i2) {
 		boolean canSwap = true;
 
 		// if i1 is the first element, we have to check just if i2 < i1+1
-		if (i1 == 0) //the first element of the array
-			canSwap &= (array[i2] < array[i1+1]);
+		if (i1 != 0) // the first element of the array
+			canSwap &= (array[i2] > array[i1-1]);
 		// otherwise we also need to check if i2 > i1-1
-		if (canSwap) canSwap &= (array[i2] > array[i1-1]);
+		if (canSwap) canSwap &= (array[i2] <= array[i1+1]);
 
 		// if i2 is the last element, we have to check just if i1 > i2-1
-		if (canSwap && i2 == array.length-1)
-			canSwap &= (array[i1] > array[i2-1]);
+		if (canSwap && i2 != array.length-1)
+			canSwap &= (array[i1] < array[i2+1]);
 		// otherwise we also need to check if i1 < i2+1
-		if (canSwap) canSwap &= (array[i1] < array[i2+1]);
+		if (canSwap) canSwap &= (array[i1] >= array[i2-1]);
+		
+		if (canSwap)
+			swap(array, i1, i2);
 		
 		return canSwap;
 	}
+	
 	// swap two elements of the array (O(1))
 	private static void swap(int[] array, int i1, int i2) {
 		int aux = array[i1];
@@ -75,51 +79,14 @@ public class Solution {
    			index2 = oldIndex;
    			
    			if (runs == 1) { // that means the rest of the array is sorted, so either we swap index-1 and index or we cannot sort the array
-   				if (index+1 >= array.length) { //then index is the last element of the array
-   					if (array[index] > array[index-2]) {
-	   					swap(array, index-1, index);
-	   					operation = "swap ".concat(Integer.toString(index)).concat(" ").concat(Integer.toString(index+1));
-   					} else
-   						sorted = false;
-   				} else if (array[index-1] < array[index+1] && 
-   							array[index] > array[index-2]) {
-	   					swap(array, index-1, index);
-	   					operation = "swap ".concat(Integer.toString(index)).concat(" ").concat(Integer.toString(index+1));
-   				} else
-   					sorted = false;
+   				sorted = trySwap(array, index-1, index);
+   				if (sorted)
+   					operation = "swap ".concat(Integer.toString(index).concat(" ").concat(Integer.toString(index+1)));
    			} else {
    				if (runs == 2) { // that means it may be possible to swap index-1 and index2 if array is sorted after that
-   					if (index-2 < 0) { //then, index is the second element of the array and we cannot go index-2
-   	   					if (array[index2] < array[index] && 
-   	   							array[index-1] > array[index2-1]) {
-   	   						if (index2 != array.length-1) { //index2 is not the last element
-   	   							if (array[index-1] < array[index2+1]) {
-   	   		   						swap(array, index-1, index2);
-   	   		   	   					operation = "swap ".concat(Integer.toString(index)).concat(" ").concat(Integer.toString(index2+1));
-   	   							} else
-   	   								sorted = false;
-   	   						} else {
-   		   						swap(array, index-1, index2);
-   		   	   					operation = "swap ".concat(Integer.toString(index)).concat(" ").concat(Integer.toString(index2+1));
-   	   						}
-   	   					} else
-   	   						sorted = false;
-   					} else
-	   					if (array[index2] < array[index] && 
-	   							array[index2] > array[index-2] &&
-	   							array[index-1] > array[index2-1]) {
-	   						if (index2 != array.length-1) { //index2 is not the last element
-	   							if (array[index-1] < array[index2+1]) {
-	   		   						swap(array, index-1, index2);
-	   		   	   					operation = "swap ".concat(Integer.toString(index)).concat(" ").concat(Integer.toString(index2+1));
-	   							} else
-	   								sorted = false;
-	   						} else {
-		   						swap(array, index-1, index2);
-		   	   					operation = "swap ".concat(Integer.toString(index)).concat(" ").concat(Integer.toString(index2+1));
-	   						}
-	   					} else
-	   						sorted = false;
+   					sorted = trySwap(array, index-1, index2);
+   					if (sorted)
+   						operation = "swap ".concat(Integer.toString(index)).concat(" ").concat(Integer.toString(index2+1));
    				} else { // more than 2 runs means either we can sort by reversing or we cannot sort at all
    					reverse(array, index-1, index2);
    					if (findElementOutOfOrder(array, 1) == 0) {
