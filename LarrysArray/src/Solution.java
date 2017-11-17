@@ -10,7 +10,7 @@ public class Solution {
 	}
 	
 	public static void main(String[] args) {
-		System.out.println("Begin!");
+//		System.out.println("Begin!");
 		Scanner in = new Scanner(System.in);
 		// reading from StdIn
 		int arrays[][];
